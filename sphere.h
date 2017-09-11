@@ -11,6 +11,8 @@
 #include <QQuickWindow>
 #include <QQuickItem>
 
+#define PI 3.14159265358979323846264338327950288419716939937510582097494
+
 class Sphere : public QQuickItem
 {
     Q_OBJECT
@@ -33,11 +35,13 @@ public slots:
 protected:
     QMatrix4x4 m_ModelViewMatrix;
     QMatrix4x4 m_ProjectionMatrix;
-    QOpenGLBuffer m_VertexBuffer, m_IndexBuffer, m_ColorBuffer;
+    QOpenGLBuffer m_VertexBuffer;
     QOpenGLShaderProgram m_ShaderProgram;
 
     qreal m_rotAngle;
     QVector3D m_rotAxis;
+
+    QList<GLfloat> coordsList;
 
 };
 

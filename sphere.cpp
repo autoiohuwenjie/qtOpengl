@@ -2,8 +2,6 @@
 
 Sphere::Sphere():
     m_VertexBuffer(QOpenGLBuffer::VertexBuffer),
-    m_IndexBuffer(QOpenGLBuffer::IndexBuffer),
-    m_ColorBuffer(QOpenGLBuffer::VertexBuffer),
     m_rotAngle(0.0),
     m_rotAxis(1.0, 1.0, 0.0)
 {
@@ -19,8 +17,8 @@ void Sphere::dealWindowsChanged(QQuickWindow* pWindow) {
 }
 
 void Sphere::renderSphere() {
-   static bool runOnce = initializeSphere();
-   Q_UNUSED(runOnce)
+    static bool runOnce = initializeSphere();
+    Q_UNUSED(runOnce)
 
     // 运动
     m_ModelViewMatrix.setToIdentity( );
@@ -46,22 +44,12 @@ void Sphere::renderSphere() {
                                         3,                      // 元大小
                                         0 );                    // 迈
 
-    m_ColorBuffer.bind( );
-    int colorLoc = m_ShaderProgram.attributeLocation( "color" );
-    m_ShaderProgram.enableAttributeArray( colorLoc );
-    m_ShaderProgram.setAttributeBuffer( colorLoc,               // 位置
-                                        GL_FLOAT,               // 类型
-                                        0,                      // 偏移
-                                        4,                      // 元大小
-                                        0 );                    // 迈
-    m_IndexBuffer.bind( );
+
     m_ShaderProgram.setUniformValue( "modelViewMatrix", m_ModelViewMatrix );
     m_ShaderProgram.setUniformValue( "projectionMatrix", m_ProjectionMatrix );
-    glDrawElements( GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, Q_NULLPTR );
+    glDrawArrays( GL_LINE_STRIP, 0, coordsList.size()/3);
 
     m_ShaderProgram.disableAttributeArray( posLoc );
-    m_ShaderProgram.disableAttributeArray( colorLoc );
-    m_IndexBuffer.release( );
     m_VertexBuffer.release( );
     m_ShaderProgram.release( );
 
@@ -76,63 +64,55 @@ bool Sphere::initializeSphere() {
                                              ":/Shader/Shader.fsh" );
 
 
-    bool flag = m_ShaderProgram.link( );
+    m_ShaderProgram.link( );
 
-    qWarning() << "shaderProgram flag is " << flag;
     // 初始化顶点缓存
-    const GLfloat length = 10.0f;
-    const GLfloat vertices[] =
-    {
-        length, -length, length,
-        length, -length, -length,
-        -length, -length, -length,
-        -length, -length, length,
-        length, length, length,
-        length, length, -length,
-        -length, length, -length,
-        -length, length, length
-    };
+    int stack = 12;//层数
+    float stackStep = (float)(PI/stack);
+
+    int slice = 16;//水平递增的角度
+    float sliceStep = (float)(PI/slice);
+
+    float r0,r1,y0,y1,x0,x1,z0,z1;
+
+    float alpha0 = 0, alpha1 = 0;
+    float beta = 0;
+    const GLfloat R = 20.0f;
+
+
+    for(int i = 0; i <= stack; i++){
+        alpha0 = (float)(-PI / 2 + (i * stackStep));
+        alpha1 = (float)(-PI / 2 + (i + 1) * stackStep);
+        y0 = (float)(R * sin(alpha0));
+        r0 = (float)(R * cos(alpha0));
+        y1 = (float)(R * sin(alpha1));
+        r1 = (float)(R * cos(alpha1));
+        for(int j = 0; j <= slice * 2 ; j++){
+            beta = j * sliceStep;
+            x0 = (float)(r0 * cos(beta));
+            z0 = -(float)(r0 * sin(beta));
+            x1 = (float)(r1 * cos(beta));
+            z1 = -(float)(r1 * sin(beta));
+            coordsList.append(x0);
+            coordsList.append(y0);
+            coordsList.append(z0);
+            coordsList.append(x1);
+            coordsList.append(y1);
+            coordsList.append(z1);
+        }
+    }
+
+
+    GLfloat vertices[coordsList.size()];
+    for(int i = 0; i < coordsList.size(); ++i) {
+        vertices[i] = coordsList.at(i);
+    }
 
     m_VertexBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
 
     m_VertexBuffer.create( );
     m_VertexBuffer.bind( );
     m_VertexBuffer.allocate( vertices, sizeof( vertices ) );
-
-
-    // 初始化颜色的缓存
-    const GLfloat colors[] =
-    {
-        1.0f, 0.0f, 1.0f, 1.0f,
-        1.0f, 0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f, 1.0f,
-        1.0f, 1.0f, 0.0f, 1.0f,
-        0.0f, 1.0f, 0.0f, 1.0f,
-        0.0f, 1.0f, 1.0f, 1.0f
-    };
-    m_ColorBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
-    m_ColorBuffer.create( );
-    m_ColorBuffer.bind( );
-    m_ColorBuffer.allocate( colors, sizeof( colors ) );
-
-
-    // 初始化索引缓存
-    GLubyte indices[] =
-    {
-        0, 1, 2, 0, 2, 3,// 下面
-        7, 6, 4, 6, 5, 4,// 上面
-        7, 4, 3, 4, 0, 3,// 左面
-        5, 6, 1, 6, 2, 1,// 右面
-        4, 5, 0, 5, 1, 0,// 前面
-        3, 2, 6, 3, 6, 7,// 背面
-    };
-
-    m_IndexBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
-    m_IndexBuffer.create( );
-    m_IndexBuffer.bind( );
-    m_IndexBuffer.allocate( indices, sizeof( indices ) );
 
     // 设定模型矩阵和投影矩阵
     float aspectRatio  = float( window( )->width( ) ) / float( window( )->height( ) );
@@ -150,8 +130,6 @@ bool Sphere::initializeSphere() {
 
 void Sphere::releaseBuffer() {
     m_VertexBuffer.destroy();
-    m_IndexBuffer.destroy();
-    m_ColorBuffer.destroy();
 }
 
 void Sphere::setRotAngle(qreal value) {
