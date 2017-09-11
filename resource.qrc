@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>chart.js</file>
+        <file>DragText.qml</file>
+        <file>Sphere.qml</file>
+    </qresource>
+</RCC>

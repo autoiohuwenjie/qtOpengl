@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Shader/Shader.fsh</file>
+        <file>Shader/Shader.vsh</file>
+    </qresource>
+</RCC>
