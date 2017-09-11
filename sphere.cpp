@@ -67,32 +67,31 @@ bool Sphere::initializeSphere() {
     m_ShaderProgram.link( );
 
     // 初始化顶点缓存
-    int stack = 12;//层数
-    float stackStep = (float)(PI/stack);
-
-    int slice = 16;//水平递增的角度
-    float sliceStep = (float)(PI/slice);
-
-    float r0,r1,y0,y1,x0,x1,z0,z1;
-
-    float alpha0 = 0, alpha1 = 0;
-    float beta = 0;
-    const GLfloat R = 20.0f;
 
 
-    for(int i = 0; i <= stack; i++){
-        alpha0 = (float)(-PI / 2 + (i * stackStep));
-        alpha1 = (float)(-PI / 2 + (i + 1) * stackStep);
-        y0 = (float)(R * sin(alpha0));
-        r0 = (float)(R * cos(alpha0));
-        y1 = (float)(R * sin(alpha1));
-        r1 = (float)(R * cos(alpha1));
-        for(int j = 0; j <= slice * 2 ; j++){
-            beta = j * sliceStep;
-            x0 = (float)(r0 * cos(beta));
-            z0 = -(float)(r0 * sin(beta));
-            x1 = (float)(r1 * cos(beta));
-            z1 = -(float)(r1 * sin(beta));
+    float Rinner = 10.0f;
+    float Rring = 20.0f;
+    float x0 = 0,y0 = 0,z0 = 0,x1 = 0,y1 = 0,z1 = 0;
+
+    int count = 20;
+    float alpha = 0;
+    float alpha0 = 0;
+    float alphaStep = (float)(PI * 2/count);
+    int count0 = 20;
+    float beta =0;
+    float betaStep = (float)(PI * 2/count0);
+    for(int i = 0; i <= count; i++){
+        alpha = i * alphaStep;
+        alpha0 = (i + 1) * alphaStep;
+        for(int j = 0; j <= count0; j++){
+            beta = j * betaStep;
+            x0 = (float)((Rinner + (Rring - Rinner)/2 * cos(beta))*(cos(alpha)));
+            y0 = (float)((Rinner + (Rring - Rinner)/2 * cos(beta))*(sin(alpha)));
+            z0 = (float) ((Rring - Rinner) / 2 * sin(beta));
+
+            x1 = (float)((Rinner + (Rring - Rinner)/2 * cos(beta))*(cos(alpha0)));
+            y1 = (float)((Rinner + (Rring - Rinner)/2 * cos(beta))*(sin(alpha0)));
+            z1 = (float) ((Rring - Rinner) / 2 * sin(beta));
             coordsList.append(x0);
             coordsList.append(y0);
             coordsList.append(z0);
