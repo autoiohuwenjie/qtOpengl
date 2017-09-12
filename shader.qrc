@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>shader/gl3/fire.frag</file>
+        <file>shader/gl3/fire.vert</file>
+    </qresource>
+</RCC>
