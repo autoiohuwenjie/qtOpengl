@@ -29,6 +29,7 @@ public slots:
     void renderSphere();
     void dealWindowsChanged(QQuickWindow* );
     void releaseBuffer();
+    void parseObj(QString);
 
     void setRotAngle(qreal);
     void setRotAxis(QVector3D);

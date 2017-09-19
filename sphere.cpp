@@ -16,13 +16,38 @@ void Sphere::dealWindowsChanged(QQuickWindow* pWindow) {
     pWindow->setClearBeforeRendering( false );
 }
 
+void Sphere::parseObj(QString obj) {
+    QFile file(obj);
+    if(!file.open( QIODevice::ReadOnly| QIODevice::Text)) {
+        qWarning() << "the document is hard to open";
+        return;
+    }
+    //qWarning() << file.readAll();
+    while (!file.atEnd()) {
+        QByteArray line = file.readLine();
+        if(line.at(0) == 'v' && line.at(1) == ' ') {
+            QString tempString(line);
+            tempString.remove(0, 2);
+            tempString.replace(" ","\\");
+            //tempString.remove(line.size() - 1, 1);
+            QStringList segStringList = tempString.split("\\",QString::SkipEmptyParts);
+            for(int i = 0; i < segStringList.size(); ++i) {
+                qWarning() << "string:" << segStringList.at(i);
+                QString tempString2 = segStringList.at(i);
+                coordsList.append(tempString2.toDouble());
+            }
+        }
+    }
+
+}
+
 void Sphere::renderSphere() {
     static bool runOnce = initializeSphere();
     Q_UNUSED(runOnce)
 
     // 运动
     m_ModelViewMatrix.setToIdentity( );
-    m_ModelViewMatrix.translate( 0.0f, 0.0f, -60.0f );
+    m_ModelViewMatrix.translate( 0.0f, 0.0f, -300.0f );
     m_ModelViewMatrix.rotate( m_rotAngle, m_rotAxis.x( ),
                               m_rotAxis.y( ), m_rotAxis.z( ) );
 
@@ -68,38 +93,38 @@ bool Sphere::initializeSphere() {
 
     // 初始化顶点缓存
 
+    parseObj(":/Obj/redCar.txt");
+    //    float Rinner = 10.0f;
+    //    float Rring = 20.0f;
+    //    float x0 = 0,y0 = 0,z0 = 0,x1 = 0,y1 = 0,z1 = 0;
 
-    float Rinner = 10.0f;
-    float Rring = 20.0f;
-    float x0 = 0,y0 = 0,z0 = 0,x1 = 0,y1 = 0,z1 = 0;
+    //    int count = 20;
+    //    float alpha = 0;
+    //    float alpha0 = 0;
+    //    float alphaStep = (float)(PI * 2/count);
+    //    int count0 = 20;
+    //    float beta =0;
+    //    float betaStep = (float)(PI * 2/count0);
+    //    for(int i = 0; i <= count; i++){
+    //        alpha = i * alphaStep;
+    //        alpha0 = (i + 1) * alphaStep;
+    //        for(int j = 0; j <= count0; j++){
+    //            beta = j * betaStep;
+    //            x0 = (float)((Rinner + (Rring - Rinner)/2 * cos(beta))*(cos(alpha)));
+    //            y0 = (float)((Rinner + (Rring - Rinner)/2 * cos(beta))*(sin(alpha)));
+    //            z0 = (float) ((Rring - Rinner) / 2 * sin(beta));
 
-    int count = 20;
-    float alpha = 0;
-    float alpha0 = 0;
-    float alphaStep = (float)(PI * 2/count);
-    int count0 = 20;
-    float beta =0;
-    float betaStep = (float)(PI * 2/count0);
-    for(int i = 0; i <= count; i++){
-        alpha = i * alphaStep;
-        alpha0 = (i + 1) * alphaStep;
-        for(int j = 0; j <= count0; j++){
-            beta = j * betaStep;
-            x0 = (float)((Rinner + (Rring - Rinner)/2 * cos(beta))*(cos(alpha)));
-            y0 = (float)((Rinner + (Rring - Rinner)/2 * cos(beta))*(sin(alpha)));
-            z0 = (float) ((Rring - Rinner) / 2 * sin(beta));
-
-            x1 = (float)((Rinner + (Rring - Rinner)/2 * cos(beta))*(cos(alpha0)));
-            y1 = (float)((Rinner + (Rring - Rinner)/2 * cos(beta))*(sin(alpha0)));
-            z1 = (float) ((Rring - Rinner) / 2 * sin(beta));
-            coordsList.append(x0);
-            coordsList.append(y0);
-            coordsList.append(z0);
-            coordsList.append(x1);
-            coordsList.append(y1);
-            coordsList.append(z1);
-        }
-    }
+    //            x1 = (float)((Rinner + (Rring - Rinner)/2 * cos(beta))*(cos(alpha0)));
+    //            y1 = (float)((Rinner + (Rring - Rinner)/2 * cos(beta))*(sin(alpha0)));
+    //            z1 = (float) ((Rring - Rinner) / 2 * sin(beta));
+    //            coordsList.append(x0);
+    //            coordsList.append(y0);
+    //            coordsList.append(z0);
+    //            coordsList.append(x1);
+    //            coordsList.append(y1);
+    //            coordsList.append(z1);
+    //        }
+    //    }
 
 
     GLfloat vertices[coordsList.size()];

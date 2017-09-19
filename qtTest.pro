@@ -31,7 +31,8 @@ SOURCES += \
     main.cpp \
     htmltest.cpp \
     qmlcommunication.cpp \
-    sphere.cpp
+    sphere.cpp \
+    verticle.cpp
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
@@ -39,8 +40,10 @@ HEADERS += \
     consttest.h \
     htmltest.h \
     qmlcommunication.h \
-    sphere.h
+    sphere.h \
+    verticle.h
 
 RESOURCES += \
     resource.qrc \
-    shader.qrc
+    shader.qrc \
+    models.qrc

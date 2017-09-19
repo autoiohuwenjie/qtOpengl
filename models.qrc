@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Obj/redCar.txt</file>
+    </qresource>
+</RCC>

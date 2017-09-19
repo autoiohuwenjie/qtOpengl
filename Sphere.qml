@@ -5,8 +5,8 @@ import OpenGLSphere 1.0
 Item
 {
     id: root
-    width: 500
-    height: 500
+    width: 1920
+    height: 720
 
     Sphere
     {
